@@ -1,23 +1,52 @@
+import * as React from 'react'
+import { cn } from '@/lib/utils'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
-import type { ReactNode } from 'react'
-import { useTranslation } from 'react-i18next'
-import { cn } from '@/lib/utils'
 
-export const Dialog = DialogPrimitive.Root
-export const DialogTrigger = DialogPrimitive.Trigger
-export const DialogClose = DialogPrimitive.Close
+const Dialog = DialogPrimitive.Root
+const DialogTrigger = DialogPrimitive.Trigger
+const DialogPortal = DialogPrimitive.Portal
+const DialogClose = DialogPrimitive.Close
 
-export function DialogContent({ children, className, title }: { children: ReactNode; className?: string; title?: string }) {
-  const { t } = useTranslation()
-  return (
-    <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-charcoal-900/40 backdrop-blur-sm data-[state=open]:animate-rise" />
-      <DialogPrimitive.Content className={cn('fixed bottom-0 left-0 right-0 z-50 max-h-screen overflow-auto rounded-t-3xl bg-rice-50 p-5 shadow-float focus:outline-none md:bottom-auto md:left-1/2 md:right-auto md:top-1/2 md:w-full md:max-w-lg md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-3xl md:p-6', className)}>
-        {title && <DialogPrimitive.Title className="pr-10 text-xl font-bold text-charcoal-900">{title}</DialogPrimitive.Title>}
-        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-full bg-white p-2 text-charcoal-500 shadow-sm transition hover:text-chili-500" aria-label={t("common.aria_close")}><X size={18} /></DialogPrimitive.Close>
-        {children}
-      </DialogPrimitive.Content>
-    </DialogPrimitive.Portal>
-  )
-}
+const DialogOverlay = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Overlay
+    ref={ref}
+    className={cn(
+      'fixed inset-0 z-40 bg-black/30 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 dark:bg-black/50',
+      className,
+    )}
+    {...props}
+  />
+))
+DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
+
+const DialogContent = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { title?: string }
+>(({ className, children, title, ...props }, ref) => (
+  <DialogPortal>
+    <DialogOverlay />
+    <DialogPrimitive.Content
+      ref={ref}
+      className={cn(
+        'fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-3xl bg-white p-5 shadow-float focus-visible:outline-none dark:bg-charcoal-800 dark:shadow-float-dark',
+        className,
+      )}
+      {...props}
+    >
+      <div className="flex items-start justify-between">
+        {title && <h2 className="text-xl font-extrabold text-charcoal-900 dark:text-rice-100">{title}</h2>}
+        <DialogPrimitive.Close className="ml-auto flex h-8 w-8 items-center justify-center rounded-xl text-charcoal-500 transition hover:bg-rice-200 dark:text-rice-300 dark:hover:bg-charcoal-700">
+          <X size={18} />
+        </DialogPrimitive.Close>
+      </div>
+      {children}
+    </DialogPrimitive.Content>
+  </DialogPortal>
+))
+DialogContent.displayName = DialogPrimitive.Content.displayName
+
+export { Dialog, DialogContent, DialogClose, DialogOverlay, DialogPortal, DialogTrigger }
