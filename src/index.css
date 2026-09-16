@@ -7,6 +7,7 @@
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body { margin: 0; min-width: 320px; min-height: 100vh; background: #fbf5ea; }
+html.dark body { background: #211f1c; }
 button, input { font: inherit; }
 ::selection { background: #ffddd8; color: #a9231a; }
 
@@ -35,6 +36,9 @@ html * {
   .paper-noise {
     background-image: radial-gradient(rgba(170, 110, 60, .08) .7px, transparent .7px);
     background-size: 12px 12px;
+  }
+  .dark .paper-noise {
+    background-image: radial-gradient(rgba(255, 255, 255, .06) .7px, transparent .7px);
   }
   .scrollbar-none::-webkit-scrollbar { display: none; }
 }
